@@ -1,19 +1,18 @@
-// index.js
 const express = require('express');
 const cors = require('cors');
 const app = express();
 
-app.use(cors({optionsSuccessStatus: 200}));
+app.use(cors({ optionsSuccessStatus: 200 }));
 app.use(express.static('public'));
 
-app.get("/", function (req, res) {
+app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html');
 });
 
-app.get("/api/:date?", function (req, res) {
+app.get('/api/:date?', (req, res) => {
   let dateString = req.params.date;
-  
-  // Handle empty date parameter
+
+  // Handle empty date parameter (return current time)
   if (!dateString) {
     const now = new Date();
     return res.json({
@@ -22,25 +21,26 @@ app.get("/api/:date?", function (req, res) {
     });
   }
 
-  // Check if input is Unix timestamp (number)
+  // Check for Unix timestamp (numeric string)
   if (/^\d+$/.test(dateString)) {
     dateString = parseInt(dateString);
   }
 
   const date = new Date(dateString);
-  
-  // Handle invalid date
+
+  // Handle invalid dates
   if (isNaN(date.getTime())) {
     return res.json({ error: "Invalid Date" });
   }
 
-  // Successful response
+  // Return successful response
   res.json({
     unix: date.getTime(),
     utc: date.toUTCString()
   });
 });
 
-const listener = app.listen(process.env.PORT || 3000, function () {
-  console.log('Your app is listening on port ' + listener.address().port);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
